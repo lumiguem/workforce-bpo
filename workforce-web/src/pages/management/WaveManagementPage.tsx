@@ -88,6 +88,7 @@ export function WaveManagementPage() {
               <tr className="bg-white/5 text-slate-400 text-xs uppercase tracking-wider font-semibold border-b border-white/10">
                 <th className="px-6 py-4">ID</th>
                 <th className="px-6 py-4">Wave / Descripción</th>
+                <th className="px-6 py-4">Intérpretes</th>
                 <th className="px-6 py-4">Fechas (Inicio - Fin)</th>
                 <th className="px-6 py-4">Estado</th>
                 <th className="px-6 py-4 text-right">Acciones</th>
@@ -96,14 +97,14 @@ export function WaveManagementPage() {
             <tbody className="divide-y divide-white/5">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
                     <Layers size={48} className="mx-auto mb-4 opacity-20 animate-pulse" />
                     <p>Cargando waves...</p>
                   </td>
                 </tr>
               ) : filteredWaves.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
                     <p>No se encontraron waves configuradas.</p>
                   </td>
                 </tr>
@@ -114,6 +115,11 @@ export function WaveManagementPage() {
                     <td className="px-6 py-4">
                       <p className="text-white font-medium">{wave.waveName}</p>
                       <p className="text-xs text-slate-500 truncate max-w-xs">{wave.description || 'Sin descripción'}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold border border-blue-500/20">
+                        {wave.interpreterCount ?? 0}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-xs text-slate-400">

@@ -12,6 +12,7 @@ interface WaveFormModalProps {
 
 export function WaveFormModal({ isOpen, onClose, onSuccess, wave }: WaveFormModalProps) {
   const [loading, setLoading] = useState(false);
+  const isCreating = !wave;
   const [formData, setFormData] = useState({
     waveName: '',
     description: '',
@@ -47,14 +48,32 @@ export function WaveFormModal({ isOpen, onClose, onSuccess, wave }: WaveFormModa
     setFormData({ ...formData, stages: newStages });
   };
 
+  const normalizeStagesForSubmit = () => {
+    return formData.stages.map((stage) => {
+      if (isCreating && stage.stageName === 'PRODUCTION') {
+        return {
+          ...stage,
+          endDate: null
+        };
+      }
+
+      return stage;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+      const payload = {
+        ...formData,
+        stages: normalizeStagesForSubmit()
+      };
+
       if (wave) {
-        await waveService.updateWave(wave.waveId, formData as any);
+        await waveService.updateWave(wave.waveId, payload as any);
       } else {
-        await waveService.createWave(formData as any);
+        await waveService.createWave(payload as any);
       }
       onSuccess();
       onClose();
@@ -109,7 +128,7 @@ export function WaveFormModal({ isOpen, onClose, onSuccess, wave }: WaveFormModa
               <label className="text-sm font-medium text-slate-400">Descripción</label>
               <textarea
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(egit) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full bg-[#0A0C10] border border-white/10 rounded-lg py-2 px-4 text-white focus:outline-none focus:border-blue-500 transition-colors resize-none h-20"
               />
             </div>
@@ -146,9 +165,13 @@ export function WaveFormModal({ isOpen, onClose, onSuccess, wave }: WaveFormModa
                         <input
                           type="date"
                           value={stage.endDate || ''}
+                          disabled={isCreating && stage.stageName === 'PRODUCTION'}
                           onChange={(e) => handleStageChange(index, 'endDate', e.target.value)}
-                          className="w-full bg-[#0A0C10] border border-white/10 rounded-lg py-1.5 px-3 text-sm text-white focus:outline-none focus:border-blue-500 [color-scheme:dark] appearance-auto"
+                          className="w-full bg-[#0A0C10] border border-white/10 rounded-lg py-1.5 px-3 text-sm text-white focus:outline-none focus:border-blue-500 [color-scheme:dark] appearance-auto disabled:opacity-40 disabled:cursor-not-allowed"
                         />
+                        {isCreating && stage.stageName === 'PRODUCTION' && (
+                          <p className="text-[10px] text-slate-500">Se mantiene indefinido al entrar en producción.</p>
+                        )}
                       </div>
                     </div>
                   </div>

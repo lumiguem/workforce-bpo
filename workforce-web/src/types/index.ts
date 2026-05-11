@@ -25,6 +25,7 @@ export interface Wave {
   description: string;
   startDate: string;
   currentStage: 'TRAINING' | 'NESTING' | 'PRODUCTION' | 'COMPLETED' | 'UPCOMING';
+  interpreterCount: number;
   stages: WaveStage[];
 }
 
