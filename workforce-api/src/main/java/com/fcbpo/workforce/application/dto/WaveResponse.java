@@ -15,6 +15,7 @@ public class WaveResponse {
     private String description;
     private LocalDate startDate;
     private String currentStage; // TRAINING, NESTING, PRODUCTION, COMPLETED, UPCOMING
+    private Long interpreterCount;
     private List<WaveStageResponse> stages;
 
     @Getter

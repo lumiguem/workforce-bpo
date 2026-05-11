@@ -4,11 +4,14 @@ import com.fcbpo.workforce.application.dto.WaveResponse;
 import com.fcbpo.workforce.domain.model.Wave;
 import com.fcbpo.workforce.domain.model.WaveStage;
 import com.fcbpo.workforce.domain.repository.WaveRepository;
+import com.fcbpo.workforce.infrastructure.persistence.repository.InterpreterDetailsJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -16,34 +19,46 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WaveService {
     private final WaveRepository waveRepository;
+    private final InterpreterDetailsJpaRepository interpreterDetailsJpaRepository;
 
     @Transactional(readOnly = true)
     public List<WaveResponse> getAllWaves() {
-
+        Map<Integer, Long> interpreterCountsByWaveId = getInterpreterCountsByWaveId();
         return waveRepository.findAll().stream()
-                .map(this::toResponse)
+                .map(wave -> toResponse(wave, interpreterCountsByWaveId.getOrDefault(wave.getWaveId(), 0L)))
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public WaveResponse getWaveById(Integer id) {
-        return toResponse(waveRepository.findById(id).orElseThrow());
+        Wave wave = waveRepository.findById(id).orElseThrow();
+        Long interpreterCount = getInterpreterCountsByWaveId().getOrDefault(id, 0L);
+        return toResponse(wave, interpreterCount);
     }
 
     public WaveResponse createWave(Wave wave) {
-        return toResponse(waveRepository.save(wave));
+        return toResponse(waveRepository.save(wave), 0L);
     }
 
     public WaveResponse updateWave(Integer id, Wave wave) {
         wave.setWaveId(id);
-        return toResponse(waveRepository.save(wave));
+        Long interpreterCount = getInterpreterCountsByWaveId().getOrDefault(id, 0L);
+        return toResponse(waveRepository.save(wave), interpreterCount);
     }
 
     public void deleteWave(Integer id) {
         waveRepository.deleteById(id);
     }
 
-    private WaveResponse toResponse(Wave wave) {
+    private Map<Integer, Long> getInterpreterCountsByWaveId() {
+        return interpreterDetailsJpaRepository.countInterpretersByWaveId().stream()
+                .collect(Collectors.toMap(
+                        InterpreterDetailsJpaRepository.WaveInterpreterCountProjection::getWaveId,
+                        InterpreterDetailsJpaRepository.WaveInterpreterCountProjection::getInterpreterCount
+                ));
+    }
+
+    private WaveResponse toResponse(Wave wave, Long interpreterCount) {
         LocalDate now = LocalDate.now();
         String currentStage = "UPCOMING";
         
@@ -83,6 +98,7 @@ public class WaveService {
                 .description(wave.getDescription())
                 .startDate(wave.getStartDate())
                 .currentStage(currentStage)
+                .interpreterCount(interpreterCount)
                 .stages(stageResponses)
                 .build();
     }
