@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface RoleRepository {
     List<Role> findAll();
     Optional<Role> findById(Integer id);
+    Optional<Role> findByRoleName(String roleName);
 }

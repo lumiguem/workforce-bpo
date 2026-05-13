@@ -35,10 +35,11 @@ public class InterpreterWithDetailsResponse {
     public static class Details {
         private Integer interpreterId;
         private Integer waveId;
+        private String waveName;
         private Integer contractId;
         private LocalDate startDate;
         private LocalDate nestingDate;
         private LocalDate productionStartDate;
+        private String currentStage;
     }
 }
-

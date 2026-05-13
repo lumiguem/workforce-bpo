@@ -7,6 +7,7 @@ import com.fcbpo.workforce.domain.model.InterpreterLanguage;
 import com.fcbpo.workforce.domain.repository.EmployeeRepository;
 import com.fcbpo.workforce.domain.repository.InterpreterLanguageRepository;
 import com.fcbpo.workforce.domain.repository.LanguageRepository;
+import com.fcbpo.workforce.domain.repository.RoleRepository;
 import com.fcbpo.workforce.exception.InterpreterLanguageAlreadyExistsException;
 import com.fcbpo.workforce.exception.InterpreterLanguageNotFoundException;
 import com.fcbpo.workforce.exception.InterpreterNotFoundException;
@@ -20,10 +21,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InterpreterLanguageService {
 
-    private static final int INTERPRETER_ROLE_ID = 1;
+    private static final String INTERPRETER_ROLE_NAME = "Interpreter";
 
     private final EmployeeRepository employeeRepository;
     private final LanguageRepository languageRepository;
+    private final RoleRepository roleRepository;
     private final InterpreterLanguageRepository interpreterLanguageRepository;
 
     public List<InterpreterLanguageResponse> getAllInterpreterLanguages() {
@@ -91,7 +93,11 @@ public class InterpreterLanguageService {
         Employee employee = employeeRepository.findById(interpreterId)
                 .orElseThrow(() -> new InterpreterNotFoundException(interpreterId));
 
-        if (employee.getRoleId() == null || employee.getRoleId() != INTERPRETER_ROLE_ID) {
+        Integer interpreterRoleId = roleRepository.findByRoleName(INTERPRETER_ROLE_NAME)
+                .map(role -> role.getRoleId())
+                .orElseThrow(() -> new IllegalStateException("Interpreter role is not configured"));
+
+        if (employee.getRoleId() == null || !employee.getRoleId().equals(interpreterRoleId)) {
             throw new InterpreterNotFoundException(interpreterId);
         }
     }

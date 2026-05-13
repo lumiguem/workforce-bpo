@@ -19,6 +19,7 @@ public class DataInitializer implements CommandLineRunner {
     private final CountryJpaRepository countryJpaRepository;
     private final CityJpaRepository cityJpaRepository;
     private final StatusJpaRepository statusJpaRepository;
+    private final ContractJpaRepository contractJpaRepository;
     private final WaveJpaRepository waveJpaRepository;
     private final WaveStageJpaRepository waveStageJpaRepository;
 
@@ -30,10 +31,14 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Initializing roles...");
             roleJpaRepository.saveAll(List.of(
                     RoleEntity.builder().roleName("Administrador").build(),
+                    RoleEntity.builder().roleName("Interpreter").build(),
                     RoleEntity.builder().roleName("Supervisor").build(),
                     RoleEntity.builder().roleName("Agente").build(),
                     RoleEntity.builder().roleName("Recursos Humanos").build()
             ));
+        } else if (roleJpaRepository.findByRoleName("Interpreter").isEmpty()) {
+            log.info("Adding missing interpreter role...");
+            roleJpaRepository.save(RoleEntity.builder().roleName("Interpreter").build());
         }
 
         if (countryJpaRepository.count() == 0) {
@@ -60,6 +65,13 @@ public class DataInitializer implements CommandLineRunner {
                     StatusEntity.builder().description("Inactivo").build(),
                     StatusEntity.builder().description("En Vacaciones").build(),
                     StatusEntity.builder().description("Licencia").build()
+            ));
+        }
+
+        if (contractJpaRepository.count() == 0) {
+            log.info("Initializing contracts...");
+            contractJpaRepository.saveAll(List.of(
+                    ContractEntity.builder().contractType("Default").build()
             ));
         }
 

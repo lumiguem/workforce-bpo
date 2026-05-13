@@ -74,6 +74,30 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.CONFLICT, ex.getMessage(), request, null);
     }
 
+    @ExceptionHandler(WaveNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleWaveNotFound(
+            WaveNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(ContractNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleContractNotFound(
+            ContractNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(WaveStagesNotConfiguredException.class)
+    public ResponseEntity<ApiErrorResponse> handleWaveStagesNotConfigured(
+            WaveStagesNotConfiguredException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request, null);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(
             MethodArgumentNotValidException ex,
