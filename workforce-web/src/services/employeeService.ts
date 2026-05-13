@@ -2,8 +2,8 @@ import { http } from '../api/http';
 import { Employee } from '../types';
 
 export const employeeService = {
-  async getAllEmployees(): Promise<Employee[]> {
-    const response = await http.get<Employee[]>('/api/employees');
+  async getAllEmployees(params?: { roleId?: number }): Promise<Employee[]> {
+    const response = await http.get<Employee[]>('/api/employees', { params });
     return response.data;
   },
 

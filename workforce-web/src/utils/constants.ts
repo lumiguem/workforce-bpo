@@ -11,12 +11,17 @@ export const SPECIALTIES = [
   'Medical', 'Legal', 'Financial', 'Insurance', 'Government', 'Technical'
 ];
 
-export const MOCK_WAVES: Wave[] = Array.from({ length: 10 }, (_, i) => ({
-  id: `WAVE-${i + 1}`,
-  name: `Wave ${i + 1}`,
-  startDate: new Date(2025, 0, 1 + (i * 14)).toISOString().split('T')[0], // Every 2 weeks starting Jan 2025
+type MockWave = Wave & { averageCsat: number };
+
+export const MOCK_WAVES: MockWave[] = Array.from({ length: 10 }, (_, i) => ({
+  waveId: i + 1,
+  waveName: `Wave ${i + 1}`,
+  description: '',
+  startDate: new Date(2025, 0, 1 + (i * 14)).toISOString().split('T')[0],
+  currentStage: 'UPCOMING',
   interpreterCount: 5,
-  averageCsat: 0 // Will be calculated
+  stages: [],
+  averageCsat: 0,
 }));
 
 const firstNames = ['Sofia', 'Jean', 'Elena', 'Li', 'Marco', 'Amira', 'Yuki', 'Carlos', 'Emma', 'Lukas', 'Aria', 'Mateo', 'Isabella', 'Gabriel', 'Zoe'];
@@ -61,7 +66,7 @@ export const MOCK_INTERPRETERS: Interpreter[] = Array.from({ length: 50 }, (_, i
 
 // Update Wave stats based on assigned interpreters
 MOCK_WAVES.forEach(wave => {
-  const waveInterpreters = MOCK_INTERPRETERS.filter(i => i.waveId === wave.id);
+  const waveInterpreters = MOCK_INTERPRETERS.filter(i => i.waveId === `WAVE-${wave.waveId}`);
   wave.interpreterCount = waveInterpreters.length;
   wave.averageCsat = parseFloat((waveInterpreters.reduce((acc, i) => acc + i.metrics.csat, 0) / waveInterpreters.length).toFixed(2));
 });

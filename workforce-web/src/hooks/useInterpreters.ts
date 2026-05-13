@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { InterpreterRosterItem, InterpreterStatus } from '@/types';
 import * as interpretersService from '@/services/interpretersService';
 
-export function useInterpreters(filters: { search: string; status: InterpreterStatus | 'all' }) {
+export function useInterpreters(filters: { search: string; status: InterpreterStatus | 'all'; refreshKey?: number }) {
   const [interpreters, setInterpreters] = useState<InterpreterRosterItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export function useInterpreters(filters: { search: string; status: InterpreterSt
     return () => {
       isCancelled = true;
     };
-  }, []);
+  }, [filters.refreshKey]);
 
   const filtered = useMemo(() => {
     const searchLower = filters.search.toLowerCase();

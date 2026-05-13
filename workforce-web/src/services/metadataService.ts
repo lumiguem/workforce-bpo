@@ -46,4 +46,14 @@ export const metadataService = {
       return [];
     }
   },
+
+  async getLanguages(): Promise<LookupItem[]> {
+    try {
+      const response = await http.get<any[]>('/api/languages');
+      return response.data.map(item => ({ id: item.id, name: item.name }));
+    } catch (error) {
+      console.error('Error fetching languages:', error);
+      return [];
+    }
+  },
 };

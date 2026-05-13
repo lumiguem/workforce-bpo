@@ -1,18 +1,47 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Activity, LayoutGrid, List, Search, Users } from 'lucide-react';
-import { InterpreterRosterItem, InterpreterStatus } from '@/types';
+import { Activity, LayoutGrid, List, Plus, Search, Users } from 'lucide-react';
+import { Employee, InterpreterRosterItem, InterpreterStatus, Wave } from '@/types';
 import { useInterpreters } from '@/hooks/useInterpreters';
 import { InterpreterCard } from '@/components/InterpreterCard';
 import { getStatusBgClass, getStatusBorderClass, getStatusTextClass } from '@/utils/interpreterUi';
+import { InterpreterFormModal } from '@/components/InterpreterFormModal';
+import { employeeService } from '@/services/employeeService';
+import { waveService } from '@/services/waveService';
+import { metadataService, LookupItem } from '@/services/metadataService';
 
 export function RosterPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<InterpreterStatus | 'all'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [selectedInterpreter, setSelectedInterpreter] = useState<InterpreterRosterItem | null>(null);
+  const [isInterpreterModalOpen, setIsInterpreterModalOpen] = useState(false);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [waves, setWaves] = useState<Wave[]>([]);
+  const [languages, setLanguages] = useState<LookupItem[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const { interpreters, filtered, isLoading, error } = useInterpreters({ search, status: statusFilter });
+  const { interpreters, filtered, isLoading, error } = useInterpreters({ search, status: statusFilter, refreshKey });
+
+  useEffect(() => {
+    const loadFormData = async () => {
+      try {
+        const [employeeData, waveData, languageData] = await Promise.all([
+          employeeService.getAllEmployees({ roleId: 1 }),
+          waveService.getAllWaves(),
+          metadataService.getLanguages(),
+        ]);
+
+        setEmployees(employeeData);
+        setWaves(waveData);
+        setLanguages(languageData);
+      } catch (metadataError) {
+        console.error('Error loading form metadata:', metadataError);
+      }
+    };
+
+    loadFormData();
+  }, []);
 
   const stats = useMemo(() => {
     return {
@@ -39,6 +68,13 @@ export function RosterPage() {
         </div>
 
         <div className="flex items-center gap-4">
+          <button
+            onClick={() => setIsInterpreterModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-sm font-bold text-blue-300 transition-colors hover:bg-blue-500/20 hover:text-white"
+          >
+            <Plus size={16} />
+            Crear intérprete
+          </button>
           <div className="text-right hidden sm:block">
             <p className="text-sm font-bold text-white leading-none">Roster</p>
             <p className="text-[10px] text-blue-400 font-medium uppercase mt-1">Operaciones</p>
@@ -233,7 +269,15 @@ export function RosterPage() {
           </div>
         )}
       </main>
+
+      <InterpreterFormModal
+        isOpen={isInterpreterModalOpen}
+        onClose={() => setIsInterpreterModalOpen(false)}
+        onSuccess={() => setRefreshKey((current) => current + 1)}
+        employees={employees}
+        waves={waves}
+        languages={languages}
+      />
     </>
   );
 }
-

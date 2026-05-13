@@ -128,7 +128,7 @@ export function WaveFormModal({ isOpen, onClose, onSuccess, wave }: WaveFormModa
               <label className="text-sm font-medium text-slate-400">Descripción</label>
               <textarea
                 value={formData.description}
-                onChange={(egit) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full bg-[#0A0C10] border border-white/10 rounded-lg py-2 px-4 text-white focus:outline-none focus:border-blue-500 transition-colors resize-none h-20"
               />
             </div>
