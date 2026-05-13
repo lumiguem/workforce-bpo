@@ -14,5 +14,6 @@ public interface InterpreterDetailsRepository {
     void deleteByInterpreterId(Integer interpreterId);
 
     List<InterpreterDetails> findAll();
-}
 
+    List<InterpreterDetails> findByWaveIdNotNull();
+}

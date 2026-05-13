@@ -6,11 +6,16 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class UpsertInterpreterDetailsRequest {
+public class CreateInterpreterSetupRequest {
 
     @NotNull
     private Integer waveId;
-    private Integer contractId;
+
+    @NotNull
+    private Integer languageId;
+
+    private Integer contractId = 1;
+
     private LocalDate startDate;
     private LocalDate nestingDate;
     private LocalDate productionStartDate;

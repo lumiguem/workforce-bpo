@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface InterpreterDetailsJpaRepository extends JpaRepository<InterpreterDetailsEntity, Integer> {
 
+    List<InterpreterDetailsEntity> findByWaveIdIsNotNull();
+
     @Query("""
         select d.waveId as waveId, count(d) as interpreterCount
         from InterpreterDetailsEntity d

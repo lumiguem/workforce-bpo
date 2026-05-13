@@ -50,6 +50,30 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.CONFLICT, ex.getMessage(), request, null);
     }
 
+    @ExceptionHandler(LanguageNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleLanguageNotFound(
+            LanguageNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(InterpreterLanguageNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleInterpreterLanguageNotFound(
+            InterpreterLanguageNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(InterpreterLanguageAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleInterpreterLanguageAlreadyExists(
+            InterpreterLanguageAlreadyExistsException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.CONFLICT, ex.getMessage(), request, null);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(
             MethodArgumentNotValidException ex,

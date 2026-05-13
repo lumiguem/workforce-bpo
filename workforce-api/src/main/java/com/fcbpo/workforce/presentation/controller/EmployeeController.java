@@ -28,9 +28,8 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public List<EmployeeResponse> getAllEmployees() {
-
-        return employeeService.getAllEmployees();
+    public List<EmployeeResponse> getAllEmployees(@RequestParam(value = "roleId", required = false) Integer roleId) {
+        return employeeService.getAllEmployees(roleId);
     }
 
     @GetMapping("/{id}")

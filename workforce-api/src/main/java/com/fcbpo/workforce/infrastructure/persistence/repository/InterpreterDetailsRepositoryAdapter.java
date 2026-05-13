@@ -49,6 +49,14 @@ public class InterpreterDetailsRepositoryAdapter implements InterpreterDetailsRe
                 .toList();
     }
 
+    @Override
+    public List<InterpreterDetails> findByWaveIdNotNull() {
+        return interpreterDetailsJpaRepository.findByWaveIdIsNotNull()
+                .stream()
+                .map(this::toDomain)
+                .toList();
+    }
+
     private InterpreterDetails toDomain(InterpreterDetailsEntity entity) {
         return InterpreterDetails.builder()
                 .interpreterId(entity.getInterpreterId())
@@ -60,4 +68,3 @@ public class InterpreterDetailsRepositoryAdapter implements InterpreterDetailsRe
                 .build();
     }
 }
-

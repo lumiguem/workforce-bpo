@@ -2,6 +2,7 @@ package com.fcbpo.workforce.application.service;
 
 import com.fcbpo.workforce.application.dto.InterpreterWithDetailsResponse;
 import com.fcbpo.workforce.domain.model.Employee;
+import com.fcbpo.workforce.domain.model.InterpreterDetails;
 import com.fcbpo.workforce.domain.repository.EmployeeRepository;
 import com.fcbpo.workforce.domain.repository.InterpreterDetailsRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,22 +24,16 @@ public class InterpreterService {
     public List<InterpreterWithDetailsResponse> listInterpreters() {
         List<Employee> interpreters = employeeRepository.findByRoleId(INTERPRETER_ROLE_ID);
 
-        Map<Integer, InterpreterWithDetailsResponse.Details> detailsByInterpreterId = interpreterDetailsRepository.findAll()
+        Map<Integer, InterpreterDetails> detailsByInterpreterId = interpreterDetailsRepository.findByWaveIdNotNull()
                 .stream()
-                .collect(java.util.stream.Collectors.toMap(
-                        d -> d.getInterpreterId(),
-                        d -> InterpreterWithDetailsResponse.Details.builder()
-                                .interpreterId(d.getInterpreterId())
-                                .waveId(d.getWaveId())
-                                .contractId(d.getContractId())
-                                .startDate(d.getStartDate())
-                                .nestingDate(d.getNestingDate())
-                                .productionStartDate(d.getProductionStartDate())
-                                .build(),
+                .collect(Collectors.toMap(
+                        InterpreterDetails::getInterpreterId,
+                        d -> d,
                         (a, b) -> a
                 ));
 
         return interpreters.stream()
+                .filter(emp -> detailsByInterpreterId.containsKey(emp.getEmployeeId()))
                 .map(emp -> InterpreterWithDetailsResponse.builder()
                         .employeeId(emp.getEmployeeId())
                         .firstName(emp.getFirstName())
@@ -51,8 +47,19 @@ public class InterpreterService {
                         .statusId(emp.getStatusId())
                         .reportsTo(emp.getReportsTo())
                         .createdAt(emp.getCreatedAt())
-                        .details(detailsByInterpreterId.get(emp.getEmployeeId()))
+                        .details(toDetailsResponse(detailsByInterpreterId.get(emp.getEmployeeId())))
                         .build())
                 .toList();
+    }
+
+    private InterpreterWithDetailsResponse.Details toDetailsResponse(InterpreterDetails details) {
+        return InterpreterWithDetailsResponse.Details.builder()
+                .interpreterId(details.getInterpreterId())
+                .waveId(details.getWaveId())
+                .contractId(details.getContractId())
+                .startDate(details.getStartDate())
+                .nestingDate(details.getNestingDate())
+                .productionStartDate(details.getProductionStartDate())
+                .build();
     }
 }

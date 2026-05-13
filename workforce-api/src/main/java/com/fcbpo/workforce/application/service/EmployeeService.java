@@ -28,7 +28,10 @@ public class EmployeeService {
         return employeeMapper.toResponse(savedEmployee);
     }
 
-    public List<EmployeeResponse> getAllEmployees() {
+    public List<EmployeeResponse> getAllEmployees(Integer roleId) {
+        if (roleId != null) {
+            return employeeMapper.toResponseList(employeeRepository.findByRoleId(roleId));
+        }
 
         return employeeMapper.toResponseList(employeeRepository.findAll());
     }
